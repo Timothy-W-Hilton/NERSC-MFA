@@ -33,6 +33,8 @@ tmpkey=''
 tmpcert=''
 tmppub=''
 pw=''
+pw_only=''  #NERSC password only (without one-time password)
+otp=''  #one-time password
 
 # Default values
 id=nersc			# Name of key file
@@ -46,14 +48,14 @@ url="sshproxy.nersc.gov"	# hostname for reaching proxy
 #############
 
 # Error(error string, ...)
-# 
+#
 # prints out error string.  Joins multiple arguments with ": "
 
 
 Error () {
 
 	# Slightly complicated print statement so that output consists of
-	# arguments joined with ": " 
+	# arguments joined with ": "
 
 	printf "$progname: %s" "$1" 1>&2
 	shift
@@ -62,7 +64,7 @@ Error () {
 }
 
 # Bail(exit code, error string, ...)
-# 
+#
 # prints out error string and exits with given exit code
 
 Bail () {
@@ -117,7 +119,7 @@ Usage () {
 	printf "\t -a \tAdd key to ssh-agent (with expiration)\n"
 	printf "\t -U <URL>\tSpecify alternate URL for sshproxy server (generally only used for testing purposes)\n"
 	printf "\n"
-	
+
 	exit 0
 }
 
@@ -201,7 +203,17 @@ pubfile="$idfile.pub"
 # prompt is interrupted by ctrl-c.  Otherwise terminal gets left in
 # a weird state.
 
-read -p "Enter your password+OTP: " -s pw
+read -p "Enter your password (without OTP): " -s pw_only
+
+# read -p doesn't output a newline after entry
+printf "\n"
+
+read -p "Enter your OTP: " -s otp
+
+# read -p doesn't output a newline after entry
+printf "\n"
+
+pw=$pw_only$otp
 
 # read -p doesn't output a newline after entry
 printf "\n"
