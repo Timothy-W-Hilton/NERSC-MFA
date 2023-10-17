@@ -201,10 +201,19 @@ pubfile="$idfile.pub"
 # prompt is interrupted by ctrl-c.  Otherwise terminal gets left in
 # a weird state.
 
-read -p "Enter your password+OTP: " -s pw
+# use 1password-cli 
+opcli=$(which op)
+if ! [ -z $opcli ]; then
+	eval $($opcli signin)
+	pass=$($opcli item get nersc --field label=password)
+	otp=$($opcli item get nersc --otp)
+	pw=$pass$otp
+else 
+	read -p "Enter your password+OTP: " -s pw
+	# read -p doesn't output a newline after entry
+	printf "\n"
+fi 
 
-# read -p doesn't output a newline after entry
-printf "\n"
 
 # Make temp files.  We want them in the same target directory as the
 # final keys
